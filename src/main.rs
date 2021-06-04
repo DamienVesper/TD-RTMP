@@ -11,8 +11,8 @@ use std::sync::mpsc::{channel, Receiver, TryRecvError};
 use std::thread;
 use slab::Slab;
 
-use ::connection::{ Connection, ConnectionError, ReadResult };
-use ::server::{ Server, ServerResult };
+use self::connection::{ Connection, ConnectionError, ReadResult };
+use self::server::{ Server, ServerResult };
 
 fn main() {
     let address = "0.0.0.0:1935";
