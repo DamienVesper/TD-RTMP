@@ -216,7 +216,7 @@ impl Server {
 
         let mut directory: String = env::current_dir().unwrap().to_str().unwrap().to_string();
         
-            directory.push_str("/public");
+            directory.push_str("/public/index.m3u8");
             println!("{}", directory);
             Command::new("ffmpeg")
                 .arg("-v")
