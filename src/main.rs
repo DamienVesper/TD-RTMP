@@ -4,6 +4,7 @@ extern crate rml_rtmp;
 
 mod connection;
 mod server;
+mod api;
 
 use std::collections::{HashSet};
 use std::net::{TcpListener, TcpStream};

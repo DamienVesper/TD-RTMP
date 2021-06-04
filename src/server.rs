@@ -209,65 +209,70 @@ impl Server {
                                    request_id: u32,
                                    app_name: String,
                                    stream_key: String,
-                                   server_results: &mut Vec<ServerResult>) {
+                                   server_results: &mut Vec<ServerResult>,
+                                   ) {
         println!("Publish requested on app '{}' and stream key '{}'", app_name, stream_key);
 
         // FFMPEG TRANSCODE
-
+                                    
+        let mut res = crate::api::get_stream_key(&stream_key);
+        println!("Body: {:?}",res);
         let mut directory: String = env::current_dir().unwrap().to_str().unwrap().to_string();
-        
-            directory.push_str("/public/index.m3u8");
-            println!("{}", directory);
-            Command::new("ffmpeg")
-                .arg("-v")
-                .arg("verbose")
-                .arg ("-y")
-                .arg("-i")
-                .arg("rtmp://127.0.0.1:1935/live/test")
-                .arg("-c:v")
-                .arg("libx264")
-                .arg("-c:a")
-                .arg("aac")
-                .arg("-ac")
-                .arg("1")
-                .arg("-strict")
-                .arg("-2")
-                .arg("-crf")
-                .arg("18")
-                .arg("-profile:v")
-                .arg("baseline")
-                .arg("-maxrate")
-                .arg("400k")
-                .arg("-bufsize")
-                .arg("1835k")
-                .arg("-pix_fmt")
-                .arg("yuv420p")
-                .arg("-flags")
-                .arg("-global_header")
-                .arg("-hls_time")
-                .arg("10")
-                .arg("-hls_list_size")
-                .arg("6")
-                .arg("-hls_wrap")
-                .arg("10")
-                .arg("-start_number")
-                .arg("1")
-                .arg(directory)
-                .spawn();
+        let username: &str = "lightwarp";
+    
+        directory.push_str(format!("/public/{}/index.m3u8", username));
+        println!("{}", directory);
+        Command::new("ffmpeg")
+            .arg("-v")
+            .arg("verbose")
+            .arg ("-y")
+            .arg("-i")
+            .arg("rtmp://127.0.0.1:1935/live/test")
+            .arg("-c:v")
+            .arg("libx264")
+            .arg("-c:a")
+            .arg("aac")
+            .arg("-ac")
+            .arg("1")
+            .arg("-strict")
+            .arg("-2")
+            .arg("-crf")
+            .arg("18")
+            .arg("-profile:v")
+            .arg("baseline")
+            .arg("-maxrate")
+            .arg("400k")
+            .arg("-bufsize")
+            .arg("1835k")
+            .arg("-pix_fmt")
+            .arg("yuv420p")
+            .arg("-flags")
+            .arg("-global_header")
+            .arg("-hls_time")
+            .arg("10")
+            .arg("-hls_list_size")
+            .arg("6")
+            .arg("-hls_wrap")
+            .arg("10")
+            .arg("-start_number")
+            .arg("1")
+            .arg(directory)
+            .spawn()
+            .expect("ffmpeg does not exist");
 
-        match self.channels.get(&stream_key) {
-            None => (),
-            Some(channel) => match channel.publishing_client_id {
+            match self.channels.get(&stream_key) {
                 None => (),
-                Some(_) => {
-                    println!("Stream key already being published to");
-                    server_results.push(ServerResult::DisconnectConnection {connection_id: requested_connection_id});
-                    return;
+                Some(channel) => match channel.publishing_client_id {
+                    None => (),
+                    Some(_) => {
+                        println!("Stream key already being published to");
+                        server_results.push(ServerResult::DisconnectConnection {connection_id: requested_connection_id});
+                        return;
+                    }
                 }
             }
-        }
 
-        let accept_result;
+            let accept_result;
         {
             let client_id = self.connection_to_client_map.get(&requested_connection_id).unwrap();
             let client = self.clients.get_mut(*client_id).unwrap();
@@ -300,6 +305,7 @@ impl Server {
             }
         }
     }
+
 
     fn handle_play_requested(&mut self,
                              requested_connection_id: usize,
