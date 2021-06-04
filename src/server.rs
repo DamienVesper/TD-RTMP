@@ -225,7 +225,7 @@ impl Server {
         Command::new("ffmpeg")
             .arg("-v")
             .arg("verbose")
-            .arg ("-y")
+            .arg("-y")
             .arg("-i")
             .arg("rtmp://127.0.0.1:1935/live/test")
             .arg("-c:v")
