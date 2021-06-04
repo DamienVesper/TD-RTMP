@@ -6,6 +6,8 @@ use rml_rtmp::sessions::{ServerSession, ServerSessionConfig, ServerSessionResult
 use rml_rtmp::sessions::StreamMetadata;
 use rml_rtmp::chunk_io::Packet;
 use rml_rtmp::time::RtmpTimestamp;
+use std::process::Command;
+use std::env;
 
 enum ClientAction {
     Waiting,
@@ -206,6 +208,15 @@ impl Server {
                                    stream_key: String,
                                    server_results: &mut Vec<ServerResult>) {
         println!("Publish requested on app '{}' and stream key '{}'", app_name, stream_key);
+
+        // FFMPEG TRANSCODE
+
+        Command::new("ffmpeg")
+            .arg("-v verbose -i rtmp://127.0.0.1:1935/live/test -c:v libx264 -c:a aac -ac 1 -strict -2 -crf 18 -profile:v baseline -maxrate 400k -bufsize 1835k -pix_fmt yuv420p -flags -global_header -hls_time 10 -hls_list_size 6 -hls_wrap 10 -start_number 1 ../public/lightwarp/index.m3u8")
+            .output().unwrap_or_else(|e| {
+                panic!("failed to execute process: {}", e)
+        });
+        println!("TRANSCODING");
 
         match self.channels.get(&stream_key) {
             None => (),
