@@ -1,3 +1,3 @@
-fn log () {
-    let Date;
-}
+// fn log () {
+//     let Date;
+// }
