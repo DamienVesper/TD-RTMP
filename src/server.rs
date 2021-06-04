@@ -7,6 +7,9 @@ use rml_rtmp::sessions::StreamMetadata;
 use rml_rtmp::chunk_io::Packet;
 use rml_rtmp::time::RtmpTimestamp;
 use std::process::Command;
+use std::string::ToString;
+use std::string::String;
+use std::result::Result;
 use std::env;
 
 enum ClientAction {
@@ -211,12 +214,46 @@ impl Server {
 
         // FFMPEG TRANSCODE
 
-        Command::new("ffmpeg")
-            .arg("-v verbose -i rtmp://127.0.0.1:1935/live/test -c:v libx264 -c:a aac -ac 1 -strict -2 -crf 18 -profile:v baseline -maxrate 400k -bufsize 1835k -pix_fmt yuv420p -flags -global_header -hls_time 10 -hls_list_size 6 -hls_wrap 10 -start_number 1 ../public/lightwarp/index.m3u8")
-            .output().unwrap_or_else(|e| {
-                panic!("failed to execute process: {}", e)
-        });
-        println!("TRANSCODING");
+        let mut directory: String = env::current_dir().unwrap().to_str().unwrap().to_string();
+        
+            directory.push_str("/public");
+            println!("{}", directory);
+            Command::new("ffmpeg")
+                .arg("-v")
+                .arg("verbose")
+                .arg ("-y")
+                .arg("-i")
+                .arg("rtmp://127.0.0.1:1935/live/test")
+                .arg("-c:v")
+                .arg("libx264")
+                .arg("-c:a")
+                .arg("aac")
+                .arg("-ac")
+                .arg("1")
+                .arg("-strict")
+                .arg("-2")
+                .arg("-crf")
+                .arg("18")
+                .arg("-profile:v")
+                .arg("baseline")
+                .arg("-maxrate")
+                .arg("400k")
+                .arg("-bufsize")
+                .arg("1835k")
+                .arg("-pix_fmt")
+                .arg("yuv420p")
+                .arg("-flags")
+                .arg("-global_header")
+                .arg("-hls_time")
+                .arg("10")
+                .arg("-hls_list_size")
+                .arg("6")
+                .arg("-hls_wrap")
+                .arg("10")
+                .arg("-start_number")
+                .arg("1")
+                .arg(directory)
+                .spawn();
 
         match self.channels.get(&stream_key) {
             None => (),
