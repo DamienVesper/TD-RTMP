@@ -244,7 +244,7 @@ impl Server {
             .arg("verbose")
             .arg("-y")
             .arg("-i")
-            .arg("rtmp://127.0.0.1:1935/live/test")
+            .arg(format!("rtmp://127.0.0.1:1935/live/{}", stream_key))
             .arg("-c:v")
             .arg("libx264")
             .arg("-c:a")
