@@ -215,13 +215,26 @@ impl Server {
 
         // FFMPEG TRANSCODE
                                     
-        let mut req = crate::api::get_stream_key(&stream_key);
+        let req = crate::api::get_stream_key(&stream_key);
         println!("BODY: {:?}",req);
         let mut directory: String = env::current_dir().unwrap().to_str().unwrap().to_string();
         let username: &str = "lightwarp";
     
-        directory.push_str(format!("/public/{}/index.m3u8", username));
+        directory.push_str(&format!("/public/{}/index.m3u8", username));
         println!("{}", directory);
+
+        match self.channels.get(&stream_key) {
+            None => (),
+            Some(channel) => match channel.publishing_client_id {
+                None => (),
+                Some(_) => {
+                    println!("Stream key already being published to");
+                    server_results.push(ServerResult::DisconnectConnection {connection_id: requested_connection_id});
+                    return;
+                }
+            }
+        }
+
         Command::new("ffmpeg")
             .arg("-v")
             .arg("verbose")
@@ -260,19 +273,7 @@ impl Server {
             .spawn()
             .expect("ffmpeg does not exist");
 
-            match self.channels.get(&stream_key) {
-                None => (),
-                Some(channel) => match channel.publishing_client_id {
-                    None => (),
-                    Some(_) => {
-                        println!("Stream key already being published to");
-                        server_results.push(ServerResult::DisconnectConnection {connection_id: requested_connection_id});
-                        return;
-                    }
-                }
-            }
-
-            let accept_result;
+        let accept_result;
         {
             let client_id = self.connection_to_client_map.get(&requested_connection_id).unwrap();
             let client = self.clients.get_mut(*client_id).unwrap();
