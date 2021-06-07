@@ -10,6 +10,7 @@ use std::process::Command;
 use std::string::ToString;
 use std::string::String;
 use std::result::Result;
+use std::fs;
 use std::env;
 
 enum ClientAction {
@@ -220,8 +221,11 @@ impl Server {
         let mut directory: String = env::current_dir().unwrap().to_str().unwrap().to_string();
         let username: &str = "lightwarp";
     
-        directory.push_str(&format!("/public/{}/index.m3u8", username));
+        directory.push_str(&format!("/public/{}", username));
         println!("{}", directory);
+
+        // Create Directory if not exists
+        fs::create_dir_all(&directory).ok();
 
         match self.channels.get(&stream_key) {
             None => (),
@@ -269,7 +273,7 @@ impl Server {
             .arg("10")
             .arg("-start_number")
             .arg("1")
-            .arg(directory)
+            .arg(format!("{}/index.m3u8", directory))
             .spawn()
             .expect("ffmpeg does not exist");
 
