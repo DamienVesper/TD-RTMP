@@ -11,6 +11,8 @@ use std::net::{TcpListener, TcpStream};
 use std::sync::mpsc::{channel, Receiver, TryRecvError};
 use std::thread;
 use slab::Slab;
+use std::env;
+use std::fs;
 
 use self::connection::{ Connection, ConnectionError, ReadResult };
 use self::server::{ Server, ServerResult };
@@ -18,6 +20,13 @@ use self::server::{ Server, ServerResult };
 fn main() {
     let address = "0.0.0.0:1935";
     let listener = TcpListener::bind(&address).unwrap();
+
+    let mut directory: String = env::current_dir().unwrap().to_str().unwrap().to_string();
+    directory.push_str("/public");
+
+    // Reset Folder
+    fs::remove_dir_all(&directory).ok();
+    fs::create_dir_all(&directory).ok();
 
     let (stream_sender, stream_receiver) = channel();
     thread::spawn(|| {handle_connections(stream_receiver)});

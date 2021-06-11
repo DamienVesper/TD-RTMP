@@ -73,7 +73,7 @@ pub async fn start(streamkey: &str) -> Result<(), Box<dyn std::error::Error>> {
 #[tokio::main]
 pub async fn stop(streamkey: &str) -> Result<(), Box<dyn std::error::Error>> { 
     let apikey = "uMGNMK323G1zOgyD2xBsuMGNMK323G13OgyD2xBsuMGNMK323G1zOgsd2xBs";
-    let res_body = reqwest::get(format!("http://throwdown.tv/api/stream-key/{}/{}", apikey, streamkey))
+    let res_body = reqwest::get(format!("http://localhost:8080/api/stream-key/{}/{}", apikey, streamkey))
         .await?
         .text()
         .await?;
