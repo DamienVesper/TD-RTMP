@@ -216,8 +216,7 @@ impl Server {
 
         // FFMPEG TRANSCODE
                                     
-        let req = crate::api::get_stream_key(&stream_key);
-        println!("BODY: {:?}", req);
+        crate::api::get(&stream_key);
         let mut directory: String = env::current_dir().unwrap().to_str().unwrap().to_string();
         let username: &str = "lightwarp";
     
