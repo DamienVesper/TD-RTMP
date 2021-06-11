@@ -214,18 +214,6 @@ impl Server {
                                    ) {
         println!("Publish requested on app '{}' and stream key '{}'", app_name, stream_key);
 
-        // FFMPEG TRANSCODE
-                                    
-        crate::api::get(&stream_key);
-        let mut directory: String = env::current_dir().unwrap().to_str().unwrap().to_string();
-        let username: &str = "lightwarp";
-    
-        directory.push_str(&format!("/public/{}", username));
-        println!("{}", directory);
-
-        // Create Directory if not exists
-        fs::create_dir_all(&directory).ok();
-
         match self.channels.get(&stream_key) {
             None => (),
             Some(channel) => match channel.publishing_client_id {
@@ -237,6 +225,18 @@ impl Server {
                 }
             }
         }
+
+        // FFMPEG TRANSCODE
+
+        crate::api::post(&stream_key);
+        let mut directory: String = env::current_dir().unwrap().to_str().unwrap().to_string();
+        let username: &str = "lightwarp";
+    
+        directory.push_str(&format!("/public/{}", username));
+        println!("{}", directory);
+
+        // Create Directory if not exists
+        fs::create_dir_all(&directory).ok();
 
         Command::new("ffmpeg")
             .arg("-v")
