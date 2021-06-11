@@ -8,7 +8,7 @@ pub async fn get(streamkey: &str) -> Result<(), Box<dyn std::error::Error>> {
     let mut map = HashMap::new();
     map.insert("apiKey", apikey);
     map.insert("streamKey", streamkey);
-    let res = client.post("http://throwdown.tv/api/stream-key")
+    let res = client.post("https://throwdown.tv/api/stream-key")
         .json(&map)
         .send()
         .await?;
