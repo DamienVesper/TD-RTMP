@@ -1135,6 +1135,7 @@ dependencies = [
  "reqwest",
  "rml_rtmp",
  "serde",
+ "serde_derive",
  "serde_json",
  "slab",
  "time",
